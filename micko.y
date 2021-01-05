@@ -57,10 +57,12 @@
 %token _THIRD
 %token _OTHERWISE
 %token _END_BRANCH
+%token _QMARK
+%token <i> _MOP
 
 
 %type <i> num_exp exp literal function_call arguments rel_exp
-%type <i> args pars if_part
+%type <i> args pars if_part cond_exp m_exp
 %type <s> vars var_inc 
 
 %nonassoc ONLY_IF
@@ -69,12 +71,30 @@
 %%
 
 program
-  : function_list
+  : global_list function_list
     {  
       if(lookup_symbol("main", FUN) == NO_INDEX)
         err("undefined reference to 'main'");
     }
   ;
+
+global_list
+  :
+  | global_list global_var
+  ;
+
+global_var
+  : _TYPE _ID _SEMICOLON
+    {
+      int idx = lookup_symbol($2, GVAR);
+      if (idx != NO_INDEX) {
+        err("redefinition of '%s'", $2);
+      }
+      else {
+        insert_symbol($2, GVAR, $1, NO_ATR, NO_ATR);
+        code("\n%s:\n\t\tWORD\t1", $2); 
+      }
+    }
 
 function_list
   : function
@@ -208,12 +228,23 @@ function_statement
 
 inc_statement
   : var_inc _SEMICOLON
+    {
+      int idx = lookup_symbol($1, (VAR|PAR|GVAR));
+      if (idx == NO_INDEX)
+        err("'%s' undeclared", $1);
+      else {
+        code("\n\t\t%s\t", ar_instructions[ADD + (get_type(idx) - 1) * AROP_NUMBER]);
+        gen_sym_name(idx);
+        code(",$1,");
+        gen_sym_name(idx);
+      }
+    }
   ;
 
 assignment_statement
   : _ID _ASSIGN num_exp _SEMICOLON
     {
-      int idx = lookup_symbol($1, VAR|PAR);
+      int idx = lookup_symbol($1, VAR|PAR|GVAR);
       if(idx == NO_INDEX)
         err("invalid lvalue '%s' in assignment", $1);
       else
@@ -224,8 +255,8 @@ assignment_statement
   ;
 
 num_exp
-  : exp
-  | num_exp _AROP exp
+  : m_exp
+  | num_exp _AROP m_exp
     {
       if(get_type($1) != get_type($3))
         err("invalid operands: arithmetic operation");
@@ -243,19 +274,63 @@ num_exp
     }
   ;
 
+  m_exp
+  : exp
+  | m_exp _MOP exp
+    {
+      if(get_type($1) != get_type($3))
+        err("invalid operands: arithmetic operation");
+      int t1 = get_type($1);    
+      code("\n\t\t%s\t", m_instructions[$2 + (t1 - 1) * MOP_NUMBER]);
+      gen_sym_name($1);
+      code(",");
+      gen_sym_name($3);
+      code(",");
+      free_if_reg($3);
+      free_if_reg($1);
+      $$ = take_reg();
+      gen_sym_name($$);
+      set_type($$, t1);
+    }
+  ;
+
 exp
   : literal
   | _ID
     {
-      $$ = lookup_symbol($1, VAR|PAR);
+      $$ = lookup_symbol($1, VAR|PAR|GVAR);
       if($$ == NO_INDEX)
         err("'%s' undeclared", $1);
     }
   | var_inc 
     {
-      $$ = lookup_symbol($1, VAR|PAR);
-      if($$ == NO_INDEX)
-        err("'%s' undeclared", $1);
+      $$ = lookup_symbol($1, VAR|PAR|GVAR);
+      if($$ == NO_INDEX) {
+        err("'%s' undeclared or trying to increment something that is not a variable or parameter", $1);
+      }
+
+        // err("'%s' undeclared", $1);
+      // else {
+      //   code("\n\t\t%s\t", ar_instructions[ADD + (get_type(idx) - 1) * AROP_NUMBER]);
+      //   gen_sym_name(idx);
+      //   code(",$1,");
+      //   gen_sym_name(idx);
+      // }
+    }
+  | _LPAREN rel_exp _RPAREN _QMARK cond_exp _COLON cond_exp
+    {
+      int out = take_reg();
+      lab_num++;
+      if(get_type($5) != get_type($7))
+        err("exp1 i exp2 nisu istog tipa");
+      code("\n\t\t%s\t@false%d", opp_jumps[$2],lab_num);
+      code("\n@true%d:", lab_num);
+      gen_mov($5, out);
+      code("\n\t\tJMP \t@exit%d", lab_num);
+      code("\n@false%d:", lab_num);
+      gen_mov($7, out);
+      code("\n@exit%d:", lab_num);
+      $$ = out;
     }
   | function_call
     {
@@ -266,12 +341,22 @@ exp
     { $$ = $2; }
   ;
 
+cond_exp
+  : _ID
+    {
+      if( ($$ = lookup_symbol($1, (VAR|PAR))) == NO_INDEX )
+        err("'%s' undeclared", $1);
+    }
+  | literal
+  ;
+
 var_inc
   : _ID _INC
     {
-      int i = lookup_symbol($1, VAR|PAR);
-      if(i == NO_INDEX)
-        err("'%s' undeclared or trying to increment something that is not a variable or parameter", $1);
+      // int i = lookup_symbol($1, VAR|PAR|GVAR);
+      // if(i == NO_INDEX)
+      //   err("'%s' undeclared or trying to increment something that is not a variable or parameter", $1);
+      // else
       $$ = $1;
     }    
   ;
@@ -292,8 +377,6 @@ function_call
     }
   _LPAREN arguments _RPAREN
     {
-      // print_symtab();
-      // printf("\n ovo %d", $4);
       if(get_atr1(fcall_idx) != $4)
         err("wrong number of args to function '%s'", get_name(fcall_idx));
       if (gl_args_type != get_atr2(fcall_idx))
@@ -431,8 +514,6 @@ return_statement
       if(get_type(fun_idx) != VOID)
           warn("'%s' should have a return statement", get_name(fun_idx));
       gl_return_val++;
-      // gen_mov($2, FUN_REG);
-      code("\n\t\tJMP \t@%s_exit", get_name(fun_idx));  
     }
   ;
 

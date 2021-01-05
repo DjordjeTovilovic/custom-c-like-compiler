@@ -1,12 +1,12 @@
-//OPIS: zarez kao pocetak argumenta
+//OPIS: pogresan broj argumenata
 
-int abs(, int i, int s) {
+int abs(int i) {
   int res;
-  if(i < 0)
+  if(i < res)
     res = 0 - i;
   else 
     res = i; 
-  return ;
+  return res;
 }
 
 int main() {

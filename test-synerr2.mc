@@ -1,7 +1,7 @@
-//OPIS: zarez kao pocetak argumenta
+//OPIS: zarez na kraju dodjele 
 
-int abs(, int i, int s) {
-  int res;
+int abs(int i, int s) {
+  int res, a, b,;
   if(i < 0)
     res = 0 - i;
   else 

@@ -1,5 +1,4 @@
-//OPIS: Numerički izraz
-//RETURN: 20
+//OPIS: Numerički izraz, rezultat -22
 
 int fja() {
   int z;
@@ -7,8 +6,8 @@ int fja() {
   int b;
   int c;
   int d;
-  int main;
-  main = 0;
+
+
   z = 2;
   a = 4;
   b = 6;
@@ -21,5 +20,5 @@ int fja() {
 int main() {
   int r;
   r = fja();
-  return r + 42;        
+  return r;        
 }

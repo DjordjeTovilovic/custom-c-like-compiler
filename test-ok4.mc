@@ -1,5 +1,4 @@
-//OPIS: if iskazi ugnjezdeni
-//RETURN: 3
+//OPIS: if iskazi ugnjezdeni, rezultat 3
 
 int f() {
   int a;

@@ -30,10 +30,15 @@ enum kinds { NO_KIND = 0x1, REG = 0x2, LIT = 0x4,
              FUN = 0x8, VAR = 0x10, PAR = 0x20, GVAR = 0x40 };
 
 //konstante arithmetickih operatora
-enum arops { ADD, SUB, MUL, DIV, AROP_NUMBER };
+enum arops { ADD, SUB, AROP_NUMBER };
+
+enum mops {MUL, DIV, MOP_NUMBER };
 //stringovi za generisanje aritmetickih naredbi
-static char *ar_instructions[] = { "ADDS", "SUBS", "MULS", "DIVS",
-                                   "ADDU", "SUBU", "MULU", "DIVU" };
+static char *ar_instructions[] = { "ADDS", "SUBS",
+                                   "ADDU", "SUBU"};
+
+static char *m_instructions[] = { "MULS", "DIVS",
+                                  "MULU", "DIVU" };
 
 //konstante relacionih operatora
 enum relops { LT, GT, LE, GE, EQ, NE, RELOP_NUMBER };

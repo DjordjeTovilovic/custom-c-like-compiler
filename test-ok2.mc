@@ -1,5 +1,4 @@
-//OPIS: Konstante
-//RETURN: 110
+//OPIS: Konstante, rezultat -562
 
 int f(int x) {
   int z;
@@ -21,7 +20,7 @@ int main() {
     a = y();
   a = -556;
 
-  return a + 666;   //110
+  return a - 6;   //-562
 }
 
 unsigned z() {

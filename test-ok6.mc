@@ -1,18 +1,29 @@
-//OPIS: primer gk
-//RETURN: 13
+//OPIS: viselinijski komentar
 
-int f(int a){
-  return 5;
+int abs(int i) {
+  int res;
+  if(i < 0)
+    res = 0 - i;
+  else 
+
+/*random komentar za obrisati
+ *%@$@!#U)(*_{}":
+ :>?>>":}{:ZXV
+  int res;
+  if(i < 0)
+    res = 0 - i;
+  else 
+    res = i; 
+  return res;
+*/
+
+    res = i; 
+  return res;
 }
 
 int main() {
-  int x;
-  int y;
-  unsigned z;
-
-  y = 15;
-  x = y - 2;
-  z = 9u;
-
-  return x;
+  return abs(-5);
 }
+
+
+ 

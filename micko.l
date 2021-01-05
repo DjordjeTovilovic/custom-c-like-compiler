@@ -35,10 +35,11 @@
 "="                  { return _ASSIGN; }
 ","                  { return _COMMA; }
 ":"                  { return _COLON; }
+"?"                  { return _QMARK; }
 
 
-"*"                  { yylval.i = MUL; return _AROP; }
-"/"                  { yylval.i = DIV; return _AROP; }
+"*"                  { yylval.i = MUL; return _MOP; }
+"/"                  { yylval.i = DIV; return _MOP; }
 "+"                  { yylval.i = ADD; return _AROP; }
 "-"                  { yylval.i = SUB; return _AROP; }
 "++"                 { return _INC; }

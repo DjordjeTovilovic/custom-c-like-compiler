@@ -1,9 +1,4 @@
-//OPIS: primer gk
-//RETURN: 13
-
-// int f() {
-
-// }
+//OPIS: primer gk, rezultat 13
 
 int main() {
   int x;

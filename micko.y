@@ -23,6 +23,7 @@
   int gl_var_type = -1;
   int gl_return_val = 0;
   int gl_args_type = 0;
+  int gl_args[20];
   FILE *output;
 %}
 
@@ -151,9 +152,9 @@ pars
     {
       if($3 == VOID)
           err("parameter cannot be VOID");
+      $$ = $$ + 1;
       insert_symbol($4, PAR, $3, $$, NO_ATR);
       set_atr2(fun_idx, get_atr2(fun_idx)*10 + $3);
-      $$ = $$ + 1;
     }
   ;
 
@@ -301,6 +302,8 @@ exp
       $$ = lookup_symbol($1, VAR|PAR|GVAR);
       if($$ == NO_INDEX)
         err("'%s' undeclared", $1);
+        // print_symtab();
+
     }
   | var_inc 
     {
@@ -381,6 +384,16 @@ function_call
         err("wrong number of args to function '%s'", get_name(fcall_idx));
       if (gl_args_type != get_atr2(fcall_idx))
         err ("wrong parameter type in function call '%s'", get_name(fcall_idx));
+
+      for(int i = get_atr1(fcall_idx) - 1; i >= 0; i--){  
+        // printf("  =[ ////%d//// ]", get_atr1(fcall_idx));
+        // printf("  =[%d ]", gl_args[i]);
+        free_if_reg(gl_args[i]);
+        code("\n\t\t\tPUSH\t");
+        gen_sym_name(gl_args[i]);
+      
+        print_symtab();
+      }
       code("\n\t\t\tCALL\t%s", get_name(fcall_idx));
       if($4 > 0)
         code("\n\t\t\tADDS\t%%15,$%d,%%15", $4 * 4);
@@ -404,14 +417,13 @@ args
   : num_exp
     {
       gl_args_type = (gl_args_type * 10) + get_type($1);
-      free_if_reg($1);
-      code("\n\t\t\tPUSH\t");
-      gen_sym_name($1);      
+      gl_args[0] = $1;
       $$ = 1;
     }
   | args _COMMA num_exp
     {
       gl_args_type = (gl_args_type * 10) + get_type($3);
+      gl_args[$1] = $3;
       $$ = $$ + 1;
     }
   ;

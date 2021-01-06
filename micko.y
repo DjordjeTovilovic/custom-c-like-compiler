@@ -392,7 +392,7 @@ function_call
         code("\n\t\t\tPUSH\t");
         gen_sym_name(gl_args[i]);
       
-        print_symtab();
+        // print_symtab();
       }
       code("\n\t\t\tCALL\t%s", get_name(fcall_idx));
       if($4 > 0)
@@ -442,12 +442,56 @@ iterate_statement
           err("incompatible types in assignment");
       if (atoi(get_name($4)) < atoi(get_name($6)))
         err("itarate max value is less then the min value");
+
+      gen_mov($4,i);
+      $<i>$ = ++lab_num;
+      code("\n@iterate%d:", lab_num);
+    
+    // }
+    // {
+      if(get_type(i) == INT) {
+        code("\n\t\tCMPS\t");
+
+        gen_sym_name(i);
+        code(",");
+        gen_sym_name($6);
+
+        code("\n\t\tJLES\t@exit%d", $<i>$ );
+      }
+      else {
+        code("\n\t\tCMPU\t");
+
+        gen_sym_name(i);
+        code(",");
+        gen_sym_name($6);
+
+        code("\n\t\tJLEU\t@exit%d", $<i>$ );
+      }
+
+      // code("\n\t\t%sJGTS%s\t@exit%d", get_name($4), get_name($6), $<i>$ );
+      // code("\n\t\t@exit%d", $<i>7, );
     }
   statement _STEP literal 
     {
       int i = lookup_symbol($2, VAR|PAR);
       if(get_type(i) != get_type($4) || get_type(i) != get_type($10))
           err("incompatible types in assignment");
+
+      if(get_type(i) == INT)
+        code("\n\t\tSUBS\t");
+      else
+        code("\n\t\tSUBU\t");
+      
+      gen_sym_name(i);
+
+      code(",");
+      gen_sym_name($10);
+      code(",");
+
+      gen_sym_name(i);
+
+      code("\n\t\tJMP \t@iterate%d", $<i>7);
+      code("\n@exit%d:", $<i>7);
     } 
   _SEMICOLON
   ;
@@ -556,7 +600,7 @@ int main() {
     printf("\n%d warning(s).\n", warning_count);
 
   if(error_count) {
-    remove("output.asm");
+    // remove("output.asm");
     printf("\n%d error(s).\n", error_count);
   }
 

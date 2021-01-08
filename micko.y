@@ -24,6 +24,7 @@
   int gl_return_val = 0;
   int gl_args_type = 0;
   int gl_args[20];
+  int gl_postinc[20] = {0};
   FILE *output;
 %}
 
@@ -239,6 +240,13 @@ inc_statement
         code(",$1,");
         gen_sym_name(idx);
       }
+
+      // mislim da ne treba ali ako zatreba
+      // int i = 0;
+      // while (gl_postinc[i] != 0) {
+      //   gl_postinc[i] = 0;
+      //   printf ("sgkagkasgaskg");
+      // }
     }
   ;
 
@@ -253,6 +261,16 @@ assignment_statement
           err("incompatible types in assignment");
       }
       gen_mov($3, idx);
+
+
+      int i = 0;
+      while (gl_postinc[i] != 0) {
+        code("\n\t\t%s\t", ar_instructions[ADD + (get_type(gl_postinc[i]) - 1) * AROP_NUMBER]);
+        gen_sym_name(gl_postinc[i]);
+        code(",$1,");
+        gen_sym_name(gl_postinc[i]);
+        gl_postinc[i] = 0;
+      }
     }
   ;
 
@@ -312,6 +330,26 @@ exp
       if($$ == NO_INDEX) {
         err("'%s' undeclared or trying to increment something that is not a variable or parameter", $1);
       }
+      else {
+        int i = 0;
+        while (gl_postinc[i] != 0) {
+          if (i == 20)
+            err("number of maximum postincrements in a statement exceeded");
+          i++;
+        }
+        gl_postinc[i] = $$;
+        // printf ("\n %d \n", i);
+      }
+
+      // for (int i = 0; i < 20; i++) {
+      //   if (gl_postinc[i] == 0) {
+      //     gl_postinc[i] = $$;
+      //     printf ("%d", gl_postinc[i]);
+      //     break;
+      //   }
+      //   if (i = 20)
+      //     err("number of maximum postincrements in a statement exceeded");
+      // }
 
         // err("'%s' undeclared", $1);
       // else {
@@ -507,85 +545,85 @@ branch_statement
           err("incompatible types in assignment");
         }
 
-      code("\n@branch%d:", ++lab_num);
-
+      $<i>$ = ++lab_num;
+      code("\n@branch%d:", lab_num);
+      
       if(get_type(i) == INT) {
         code("\n\t\tCMPS\t");
         gen_sym_name(i);
         code(",");
         gen_sym_name($6);
-        code("\n\t\tJEQ\t\t@first%d", lab_num);
+        code("\n\t\tJEQ\t\t@first%d", $<i>$);
 
 
         code("\n\t\tCMPS\t");
         gen_sym_name(i);
         code(",");
         gen_sym_name($8);
-        code("\n\t\tJEQ\t\t@second%d", lab_num);
+        code("\n\t\tJEQ\t\t@second%d", $<i>$);
 
         code("\n\t\tCMPS\t");
         gen_sym_name(i);
         code(",");
         gen_sym_name($10);
-        code("\n\t\tJEQ\t\t@third%d", lab_num);
+        code("\n\t\tJEQ\t\t@third%d", $<i>$);
       }
       else {
-
         code("\n\t\tCMPU\t");
         gen_sym_name(i);
         code(",");
         gen_sym_name($6);
-        code("\n\t\tJEQ\t\t@first%d", lab_num);
+        code("\n\t\tJEQ\t\t@first%d", $<i>$);
 
         code("\n\t\tCMPU\t");
         gen_sym_name(i);
         code(",");
         gen_sym_name($8);
-        code("\n\t\tJEQ\t\t@second%d", lab_num);
+        code("\n\t\tJEQ\t\t@second%d", $<i>$);
 
         code("\n\t\tCMPU\t");
         gen_sym_name(i);
         code(",");
         gen_sym_name($10);
-        code("\n\t\tJEQ\t\t@third%d", lab_num);
+        code("\n\t\tJEQ\t\t@third%d", $<i>$);
       }
-      code("\n\t\tJMP \t@otherwise%d", lab_num);
+      code("\n\t\tJMP \t@otherwise%d", $<i>$);
     }
   _FIRST 
     {
-      code("\n@first%d:", lab_num);
+      code("\n@first%d:", $<i>12);
     }
   statement
     {
-      code("\n\t\tJMP \t@exit%d", lab_num);
+      code("\n\t\tJMP \t@exit%d", $<i>12);
     }
   _SECOND
     {
-      code("\n@second%d:", lab_num);
+      code("\n@second%d:", $<i>12);
     }
   statement
     {
-      code("\n\t\tJMP \t@exit%d", lab_num);
+      code("\n\t\tJMP \t@exit%d", $<i>12);
     }
   _THIRD 
     {
-      code("\n@third%d:", lab_num);
+      code("\n@third%d:", $<i>12);
     }
   statement
     {
-      code("\n\t\tJMP \t@exit%d", lab_num);
+      code("\n\t\tJMP \t@exit%d", $<i>12);
     }
   _OTHERWISE 
     {
-      code("\n@otherwise%d:", lab_num);
+      code("\n@otherwise%d:", $<i>12);
     }
   statement
     {
-      code("\n\t\tJMP \t@exit%d", lab_num);
+      code("\n\t\tJMP \t@exit%d", $<i>12);
     }
   _END_BRANCH
     {
-      code("\n@exit%d:", lab_num--);
+      code("\n@exit%d:", $<i>12);
     }
   ;
 

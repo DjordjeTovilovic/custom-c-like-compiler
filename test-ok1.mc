@@ -6,16 +6,18 @@
 //   res = q; 
 //   return res;
 // }
-
+// int a;
+// a = 5;
 int main() {
   int b, c, z, a, res;
   // unsigned a, res;
   // c = 4;
-  a = 1;
-  res = 0;
+  a = 3;
+  // res = 0;
   b = 4;
-  c = 0;
-  // a = a + b * 2 + 4 * b + 6 * a  ;
+  // c = 0;
+  a = a + b++ * 2;
+  return a;
   // a = abs(-5, 2, c);
 
   // iterate z 4 : 0
@@ -34,18 +36,23 @@ int main() {
   // end_branch
   
 
-  branch ( a ; 1 , 3 , 5 )
-    first a = a + 1;
-    second 
-      branch ( b ; 1 , 3 , 5 )
-        first b = b + 1;
-        second b = b + 3;
-        third b = b + 5;
-        otherwise b = b - 3;
-      end_branch
-    third a = a + 5;
-    otherwise a = a - 3;
-  end_branch
+  // branch ( a ; 1 , 3 , 5 )
+  //   first a = a + 1;
+  //   second 
+  //     branch ( b ; 1 , 3 , 5 )
+  //       first b = b + 1;
+  //       second b = b + 3;
+  //       third branch ( b ; 1 , 3 , 5 )
+  //       first b = b + 1;
+  //       second b = b + 3;
+  //       third b = b + 5;
+  //       otherwise b = b - 3;
+  //     end_branch
+  //       otherwise b = b - 3;
+  //     end_branch
+  //   third a = a + 5;
+  //   otherwise a = a - 3;
+  // end_branch
 
 
   // iterate a 2 : 0
@@ -53,6 +60,6 @@ int main() {
   //       c = c + 1;
   //       step 1;
   //   step 1;
-  
-  return c;
+
+  // return b;
 }

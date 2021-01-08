@@ -260,8 +260,8 @@ assignment_statement
         if(get_type(idx) != get_type($3))
           err("incompatible types in assignment");
       }
-      gen_mov($3, idx);
 
+      gen_mov($3, idx);
 
       int i = 0;
       while (gl_postinc[i] != 0) {
@@ -270,7 +270,9 @@ assignment_statement
         code(",$1,");
         gen_sym_name(gl_postinc[i]);
         gl_postinc[i] = 0;
+        i++;
       }
+      
     }
   ;
 

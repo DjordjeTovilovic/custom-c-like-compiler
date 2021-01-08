@@ -8,16 +8,27 @@
 // }
 // int a;
 // a = 5;
+
 int main() {
-  int b, c, z, a, res;
+  int x;
+  int y;
+  x = 3;
+  y = x++ + x++ + 42;
+  return x + y;
+
+
+
+
+// int main() {
+  // int b, c, z, a, res;
   // unsigned a, res;
   // c = 4;
-  a = 3;
+  // a = 3;
   // res = 0;
-  b = 4;
+  // b = 4;
   // c = 0;
-  a = a + b++ * 2;
-  return a;
+  // a = a + b++ * 2;
+  // return a;
   // a = abs(-5, 2, c);
 
   // iterate z 4 : 0

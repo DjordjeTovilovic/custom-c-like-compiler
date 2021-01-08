@@ -23,7 +23,7 @@
   int gl_var_type = -1;
   int gl_return_val = 0;
   int gl_args_type = 0;
-  int gl_args[20];
+  int gl_args[20] = {0};
   int gl_postinc[20] = {0};
   FILE *output;
 %}

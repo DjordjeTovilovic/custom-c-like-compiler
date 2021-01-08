@@ -248,10 +248,11 @@ assignment_statement
       int idx = lookup_symbol($1, VAR|PAR|GVAR);
       if(idx == NO_INDEX)
         err("invalid lvalue '%s' in assignment", $1);
-      else
+      else {
         if(get_type(idx) != get_type($3))
           err("incompatible types in assignment");
-        gen_mov($3, idx);
+      }
+      gen_mov($3, idx);
     }
   ;
 
@@ -447,8 +448,6 @@ iterate_statement
       $<i>$ = ++lab_num;
       code("\n@iterate%d:", lab_num);
     
-    // }
-    // {
       if(get_type(i) == INT) {
         code("\n\t\tCMPS\t");
 
@@ -467,9 +466,6 @@ iterate_statement
 
         code("\n\t\tJLEU\t@exit%d", $<i>$ );
       }
-
-      // code("\n\t\t%sJGTS%s\t@exit%d", get_name($4), get_name($6), $<i>$ );
-      // code("\n\t\t@exit%d", $<i>7, );
     }
   statement _STEP literal 
     {
@@ -499,23 +495,98 @@ iterate_statement
 branch_statement
   : _BRANCH _LPAREN _ID
     {
-      int id_of_declared_int = lookup_symbol($3, VAR);
-      if(id_of_declared_int == NO_INDEX) 
+      int i = lookup_symbol($3, VAR);
+      if(i == NO_INDEX) 
         err("'%s' undeclared", $3);
     }
   _SEMICOLON literal _COMMA literal _COMMA literal _RPAREN
     {
-    int id_of_declared_int = lookup_symbol($3, VAR);
-    if(get_type(id_of_declared_int) != get_type($6) || get_type(id_of_declared_int) != get_type($8)
-      || get_type(id_of_declared_int) != get_type($10)) {
-        err("incompatible types in assignment");
+      int i = lookup_symbol($3, VAR);
+      if(get_type(i) != get_type($6) || get_type(i) != get_type($8)
+        || get_type(i) != get_type($10)) {
+          err("incompatible types in assignment");
+        }
+
+      code("\n@branch%d:", ++lab_num);
+
+      if(get_type(i) == INT) {
+        code("\n\t\tCMPS\t");
+        gen_sym_name(i);
+        code(",");
+        gen_sym_name($6);
+        code("\n\t\tJEQ\t\t@first%d", lab_num);
+
+
+        code("\n\t\tCMPS\t");
+        gen_sym_name(i);
+        code(",");
+        gen_sym_name($8);
+        code("\n\t\tJEQ\t\t@second%d", lab_num);
+
+        code("\n\t\tCMPS\t");
+        gen_sym_name(i);
+        code(",");
+        gen_sym_name($10);
+        code("\n\t\tJEQ\t\t@third%d", lab_num);
       }
+      else {
+
+        code("\n\t\tCMPU\t");
+        gen_sym_name(i);
+        code(",");
+        gen_sym_name($6);
+        code("\n\t\tJEQ\t\t@first%d", lab_num);
+
+        code("\n\t\tCMPU\t");
+        gen_sym_name(i);
+        code(",");
+        gen_sym_name($8);
+        code("\n\t\tJEQ\t\t@second%d", lab_num);
+
+        code("\n\t\tCMPU\t");
+        gen_sym_name(i);
+        code(",");
+        gen_sym_name($10);
+        code("\n\t\tJEQ\t\t@third%d", lab_num);
+      }
+      code("\n\t\tJMP \t@otherwise%d", lab_num);
     }
-  _FIRST statement
-  _SECOND statement
-  _THIRD statement
-  _OTHERWISE statement
+  _FIRST 
+    {
+      code("\n@first%d:", lab_num);
+    }
+  statement
+    {
+      code("\n\t\tJMP \t@exit%d", lab_num);
+    }
+  _SECOND
+    {
+      code("\n@second%d:", lab_num);
+    }
+  statement
+    {
+      code("\n\t\tJMP \t@exit%d", lab_num);
+    }
+  _THIRD 
+    {
+      code("\n@third%d:", lab_num);
+    }
+  statement
+    {
+      code("\n\t\tJMP \t@exit%d", lab_num);
+    }
+  _OTHERWISE 
+    {
+      code("\n@otherwise%d:", lab_num);
+    }
+  statement
+    {
+      code("\n\t\tJMP \t@exit%d", lab_num);
+    }
   _END_BRANCH
+    {
+      code("\n@exit%d:", lab_num--);
+    }
   ;
 
 if_statement

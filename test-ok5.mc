@@ -1,5 +1,5 @@
 //OPIS: primer gk, rezultat 13
-
+//RETURN 13
 int main() {
   int x;
   int y;

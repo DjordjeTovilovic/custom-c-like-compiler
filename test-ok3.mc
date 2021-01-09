@@ -1,5 +1,5 @@
 //OPIS: Numerički izraz, rezultat -22
-
+//RETURN -22
 int fja() {
   int z;
   int a;

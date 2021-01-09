@@ -1,14 +1,12 @@
 //OPIS: postinkrement
-
+//RETURN 6
 int abs(int i) {
   int res, a, b;
   a = i++;
+  res = 0;
+  b = res++;
   b = res + b++ - i;
-  if(i < 0)
-    res = 0 - i;
-  else 
-    res = i; 
-  return res;
+  return b;
 }
 
 int main() {

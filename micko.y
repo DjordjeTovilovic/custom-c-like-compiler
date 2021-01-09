@@ -274,7 +274,6 @@ assignment_statement
         gl_postinc[i] = 0;
         i++;
       }
-      
     }
   ;
 
@@ -326,7 +325,6 @@ exp
       if($$ == NO_INDEX)
         err("'%s' undeclared", $1);
         // print_symtab();
-
     }
   | var_inc 
     {
@@ -343,24 +341,6 @@ exp
         }
         gl_postinc[i] = $$;
       }
-
-      // for (int i = 0; i < 20; i++) {
-      //   if (gl_postinc[i] == 0) {
-      //     gl_postinc[i] = $$;
-      //     printf ("%d", gl_postinc[i]);
-      //     break;
-      //   }
-      //   if (i = 20)
-      //     err("number of maximum postincrements in a statement exceeded");
-      // }
-
-        // err("'%s' undeclared", $1);
-      // else {
-      //   code("\n\t\t%s\t", ar_instructions[ADD + (get_type(idx) - 1) * AROP_NUMBER]);
-      //   gen_sym_name(idx);
-      //   code(",$1,");
-      //   gen_sym_name(idx);
-      // }
     }
   | _LPAREN rel_exp _RPAREN _QMARK cond_exp _COLON cond_exp
     {

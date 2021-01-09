@@ -1,5 +1,5 @@
 //OPIS: Konstante, rezultat -562
-
+//RETURN -562
 int f(int x) {
   int z;
   return x + z;

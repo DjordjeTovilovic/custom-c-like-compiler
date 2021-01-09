@@ -1,31 +1,23 @@
 //OPIS: iterate petlja i ugnezdena iterate petlja
-
-int abs(int i, int g, int s) {
-  int z, res, a, b;
-  unsigned w;
-  a = 5 + b * z;
-  a++;
-
-  iterate z 5 : 2
-    res = b * 2;
-    step 1;
-
-  
+//RETURN 30
+int ugnjezdena(){
+  int a, g, s;
+  s = 0;
   iterate a 5 : 2
       iterate g 5 : 2 
-        s = a / 5;
+        s = s + 5;
         step 2;
     step 1;
 
+  return s;
+}
 
-  if(i < 0) {
-    res = 0 - i;
-  }
-  else {
-
-    res = i; 
-  }
-  res++;
+int petlja() {
+  int res, b, z;
+  res = 1;
+  iterate z 5 : 2
+      res = res * 2;
+      step 1;
   return res;
 }
 
@@ -33,5 +25,5 @@ int abs(int i, int g, int s) {
 int main() {
   unsigned y;
   int t;
-  return abs(-5, 5, t);
+  return ugnjezdena();
 }

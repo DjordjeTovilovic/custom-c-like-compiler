@@ -1,5 +1,5 @@
 //OPIS: viselinijski komentar
-
+//RETURN 5
 int abs(int i) {
   int res;
   if(i < 0)

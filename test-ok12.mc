@@ -1,17 +1,15 @@
 //OPIS: mnozenje i deljenje
-
-void abs(int i) {
+//RETURN -3
+int test(int i) {
   int res, a, b;
-  a = i * b;
+  b = 3;
+  res = 5;
+  a = i * b / 5;
   b = res + b++ * i / a;
   res = res / 2;
-  if(i < 0)
-    res = 0 - i;
-  else 
-    res = i; 
+  return a;
 }
 
 int main() {
-  abs(-5);
-  return 0;
+  return test(-5);
 }

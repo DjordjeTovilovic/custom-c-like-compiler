@@ -1,4 +1,5 @@
 //OPIS: delaracija vise promjenjivih 
+//RETURN 5
 
 int abs(int i) {
   int res, a, b;

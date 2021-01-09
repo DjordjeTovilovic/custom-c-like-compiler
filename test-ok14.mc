@@ -1,11 +1,8 @@
 //OPIS: branch grananje i ugnezdeno branch grananje
-
-int abs(int i, int g, int s) {
-  int z, res, a, b;
-  unsigned w;
-  a = 5 + b * z;
-  a++;
-
+//RETURN 12
+int grananje(){
+  int res, a;
+  res = 0;
   branch ( a ; 1 , 3 , 5 )
     first a = a + 1;
     second a = a + 3;
@@ -13,12 +10,19 @@ int abs(int i, int g, int s) {
     otherwise a = a - 3;
   end_branch
 
+  return a;
+}
 
+int ugnjezdeno() {
+  int res, a, b;
+  res = 0;
+  a = 3;
+  b = 1;
   branch ( a ; 1 , 3 , 5 )
     first a = a + 1;
     second 
       branch ( b ; 1 , 3 , 5 )
-        first b = b + 1;
+        first b = b + 11;
         second b = b + 3;
         third b = b + 5;
         otherwise b = b - 3;
@@ -27,17 +31,12 @@ int abs(int i, int g, int s) {
     otherwise a = a - 3;
   end_branch
 
-  if(i < 0) {
-    res = 0 - i;
-  }
-  else {
-    res = i; 
-  }
-  res++;
-  return res;
+  return b;
+
 }
 
 int main() {
-  abs(-5, 5, 6);
-  return 0;
+  int a;
+  a = grananje();
+  return ugnjezdeno();
 }

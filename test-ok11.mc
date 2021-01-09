@@ -1,5 +1,5 @@
 //OPIS: funkcije sa vise parametara
-
+//RETURN 2
 int abs(int i, int g, int s) {
   int z, res, a, b;
   unsigned w;
@@ -14,7 +14,7 @@ int abs(int i, int g, int s) {
     res = i; 
   }
   res++;
-  return res;
+  return s;
 }
 
 

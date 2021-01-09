@@ -81,13 +81,15 @@ program
   ;
 
 global_list
-  :
+  : /*empty*/
   | global_list global_var
   ;
 
 global_var
   : _TYPE _ID _SEMICOLON
     {
+      if ($1 == VOID)
+        err ("Global variables can't be void");
       int idx = lookup_symbol($2, GVAR);
       if (idx != NO_INDEX) {
         err("redefinition of '%s'", $2);
@@ -340,7 +342,6 @@ exp
           i++;
         }
         gl_postinc[i] = $$;
-        // printf ("\n %d \n", i);
       }
 
       // for (int i = 0; i < 20; i++) {
@@ -364,10 +365,9 @@ exp
   | _LPAREN rel_exp _RPAREN _QMARK cond_exp _COLON cond_exp
     {
       int out = take_reg();
-      lab_num++;
       if(get_type($5) != get_type($7))
-        err("exp1 i exp2 nisu istog tipa");
-      code("\n\t\t%s\t@false%d", opp_jumps[$2],lab_num);
+        err("exp1 i exp2 have to be the same type");
+      code("\n\t\t%s\t@false%d", opp_jumps[$2], ++lab_num);
       code("\n@true%d:", lab_num);
       gen_mov($5, out);
       code("\n\t\tJMP \t@exit%d", lab_num);
@@ -396,13 +396,7 @@ cond_exp
 
 var_inc
   : _ID _INC
-    {
-      // int i = lookup_symbol($1, VAR|PAR|GVAR);
-      // if(i == NO_INDEX)
-      //   err("'%s' undeclared or trying to increment something that is not a variable or parameter", $1);
-      // else
-      $$ = $1;
-    }    
+    { $$ = $1; }    
   ;
 
 literal
@@ -449,9 +443,7 @@ arguments
   : /* empty */
     { $$ = 0; }
   | args
-    { 
-      $$ = $1;
-    }
+    { $$ = $1; }
   ;
 
 args

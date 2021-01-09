@@ -1,5 +1,5 @@
 //OPIS: inkrement u numexp-u
-//RETURN: 54
+//RETURN: 53
 
 int y;
 

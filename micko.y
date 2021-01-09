@@ -264,13 +264,15 @@ assignment_statement
       }
 
       gen_mov($3, idx);
-
+      
       int i = 0;
       while (gl_postinc[i] != 0) {
-        code("\n\t\t%s\t", ar_instructions[ADD + (get_type(gl_postinc[i]) - 1) * AROP_NUMBER]);
-        gen_sym_name(gl_postinc[i]);
-        code(",$1,");
-        gen_sym_name(gl_postinc[i]);
+        if (idx != gl_postinc[i]) {
+          code("\n\t\t%s\t", ar_instructions[ADD + (get_type(gl_postinc[i]) - 1) * AROP_NUMBER]);
+          gen_sym_name(gl_postinc[i]);
+          code(",$1,");
+          gen_sym_name(gl_postinc[i]);
+        }
         gl_postinc[i] = 0;
         i++;
       }

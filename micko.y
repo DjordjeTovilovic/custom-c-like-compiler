@@ -61,6 +61,8 @@
 %token _END_BRANCH
 %token _QMARK
 %token <i> _MOP
+%token _LSQBRACKET
+%token _RSQBRACKET
 
 
 %type <i> num_exp exp literal function_call arguments rel_exp
@@ -81,13 +83,15 @@ program
   ;
 
 global_list
-  :
+  : /*empty*/
   | global_list global_var
   ;
 
 global_var
   : _TYPE _ID _SEMICOLON
     {
+      if( $1 == VOID)
+          err("Global variable can't be void"); 
       int idx = lookup_symbol($2, GVAR);
       if (idx != NO_INDEX) {
         err("redefinition of '%s'", $2);
@@ -96,6 +100,7 @@ global_var
         insert_symbol($2, GVAR, $1, NO_ATR, NO_ATR);
         code("\n%s:\n\t\tWORD\t1", $2); 
       }
+      // print_symtab();
     }
 
 function_list
@@ -171,14 +176,45 @@ body
 
 variable_list
   : /* empty */
-  | variable_list variable
+  | variable_list v
+  ;
+
+v
+  : _TYPE { gl_var_type = $1; } variable _SEMICOLON
+    {
+      if($1 == VOID)
+        err("variable or list type cannot be VOID");
+        // print_symtab();
+    }
   ;
 
 variable
-  : _TYPE { gl_var_type = $1; } vars _SEMICOLON 
+  : vars
+
+// deklaracija liste : int a[5];
+  | _ID _LSQBRACKET literal _RSQBRACKET 
     {
-      if($1 == VOID)
-        err("variable cannot be VOID");
+      int i = lookup_symbol($1,VAR|PAR);
+      // char* keke = $1 + [];
+      // printf("%s", keke);
+      int lit = atoi(get_name($3));
+      if(i == -1) {
+        for (int j = 0; j < lit; j++) {
+          char * keke = strcat($1, "[");
+          char * keke2 = strcat(keke, j);
+          // char buf[64];
+          // snprintf(buf, sizeof buf, "%s[%s]", $1, j);
+          insert_symbol(keke2, VAR, gl_var_type, ++var_num, atoi(get_name($3)));
+
+        }
+        // insert_symbol($1, VAR, gl_var_type, ++var_num, atoi(get_name($3)));
+        
+        // var_num = var_num + atoi(get_name($3)) - 1;
+
+        // printf("%d", var_num);
+      }
+      else
+        err("duplicated local var");
     }
   ;
 
@@ -273,6 +309,21 @@ assignment_statement
         i++;
       }
       
+    }
+  // a[5] = 10;
+  | _ID _LSQBRACKET literal _RSQBRACKET _ASSIGN num_exp _SEMICOLON 
+    {
+      int idx = lookup_symbol($1, VAR|PAR|GVAR);
+      if(idx == NO_INDEX)
+        err("invalid lvalue '%s' in assignment", $1);
+      else {
+        if(get_type(idx) != get_type($3))
+          err("incompatible types in assignment");
+      }
+      // printf("\n%d\n", atoi(get_name($3)));
+      printf("\n%d\n", idx+2);
+      print_symtab();
+      // gen_mov($6, idx+2);// + atoi(get_name($3)));
     }
   ;
 
@@ -421,6 +472,7 @@ function_call
     }
   _LPAREN arguments _RPAREN
     {
+      // print_symtab();
       if(get_atr1(fcall_idx) != $4)
         err("wrong number of args to function '%s'", get_name(fcall_idx));
       if (gl_args_type != get_atr2(fcall_idx))
@@ -468,6 +520,8 @@ args
       $$ = $$ + 1;
     }
   ;
+
+// list_assignment
 
 iterate_statement
   : _ITERATE _ID

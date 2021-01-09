@@ -36,7 +36,8 @@
 ","                  { return _COMMA; }
 ":"                  { return _COLON; }
 "?"                  { return _QMARK; }
-
+"["                  { return _LSQBRACKET; }
+"]"                  { return _RSQBRACKET; }
 
 "*"                  { yylval.i = MUL; return _MOP; }
 "/"                  { yylval.i = DIV; return _MOP; }

@@ -177,15 +177,14 @@ body
 
 variable_list
   : /* empty */
-  | variable_list v
+  | variable_list variable_or_list
   ;
 
-v
+variable_or_list
   : _TYPE { gl_var_type = $1; } variable _SEMICOLON
     {
       if($1 == VOID)
         err("variable or list type cannot be VOID");
-        // print_symtab();
     }
   ;
 
@@ -268,7 +267,7 @@ inc_statement
       // int i = 0;
       // while (gl_postinc[i] != 0) {
       //   gl_postinc[i] = 0;
-      //   printf ("sgkagkasgaskg");
+      //   printf (" |||||||||||| ");
       // }
     }
   ;
@@ -294,13 +293,14 @@ assignment_statement
           else {
             gen_mov($3, idx);
 
-              // printf(" afd fad af af");
             int i = 0;
             while (gl_postinc[i] != 0) {
-              code("\n\t\t%s\t", ar_instructions[ADD + (get_type(gl_postinc[i]) - 1) * AROP_NUMBER]);
-              gen_sym_name(gl_postinc[i]);
-              code(",$1,");
-              gen_sym_name(gl_postinc[i]);
+              if (gl_postinc[i] != idx) {
+                code("\n\t\t%s\t", ar_instructions[ADD + (get_type(gl_postinc[i]) - 1) * AROP_NUMBER]);
+                gen_sym_name(gl_postinc[i]);
+                code(",$1,");
+                gen_sym_name(gl_postinc[i]);
+              }
               gl_postinc[i] = 0;
               i++;
             }
@@ -322,13 +322,10 @@ assignment_statement
           if (atoi(get_name($3)) > get_atr2(idx))
             err("out of bound index for list");
           else {
-            // printf("\n%d\n", idx+2);
-            print_symtab();
             code("\n\t\tMOV \t");
             gen_sym_name($6);
             code(",");
             code("-%d(%%14)", (get_atr1(idx) + atoi(get_name($3))) * 4);
-            print_symtab();
           }
         }
       }
@@ -341,17 +338,19 @@ num_exp
     {
       if(get_type($1) != get_type($3))
         err("invalid operands: arithmetic operation");
-      int t1 = get_type($1);    
-      code("\n\t\t%s\t", ar_instructions[$2 + (t1 - 1) * AROP_NUMBER]);
-      gen_sym_name($1);
-      code(",");
-      gen_sym_name($3);
-      code(",");
-      free_if_reg($3);
-      free_if_reg($1);
-      $$ = take_reg();
-      gen_sym_name($$);
-      set_type($$, t1);
+      else {
+        int t1 = get_type($1);    
+        code("\n\t\t%s\t", ar_instructions[$2 + (t1 - 1) * AROP_NUMBER]);
+        gen_sym_name($1);
+        code(",");
+        gen_sym_name($3);
+        code(",");
+        free_if_reg($3);
+        free_if_reg($1);
+        $$ = take_reg();
+        gen_sym_name($$);
+        set_type($$, t1);
+      }
     }
   ;
 
@@ -361,17 +360,19 @@ num_exp
     {
       if(get_type($1) != get_type($3))
         err("invalid operands: arithmetic operation");
-      int t1 = get_type($1);    
-      code("\n\t\t%s\t", m_instructions[$2 + (t1 - 1) * MOP_NUMBER]);
-      gen_sym_name($1);
-      code(",");
-      gen_sym_name($3);
-      code(",");
-      free_if_reg($3);
-      free_if_reg($1);
-      $$ = take_reg();
-      gen_sym_name($$);
-      set_type($$, t1);
+      else {
+        int t1 = get_type($1);    
+        code("\n\t\t%s\t", m_instructions[$2 + (t1 - 1) * MOP_NUMBER]);
+        gen_sym_name($1);
+        code(",");
+        gen_sym_name($3);
+        code(",");
+        free_if_reg($3);
+        free_if_reg($1);
+        $$ = take_reg();
+        gen_sym_name($$);
+        set_type($$, t1);
+      }
     }
   ;
 
@@ -507,8 +508,6 @@ args
       $$ = $$ + 1;
     }
   ;
-
-// list_assignment
 
 iterate_statement
   : _ITERATE _ID
@@ -752,7 +751,7 @@ int main() {
     printf("\n%d warning(s).\n", warning_count);
 
   if(error_count) {
-    // remove("output.asm");
+    remove("output.asm");
     printf("\n%d error(s).\n", error_count);
   }
 

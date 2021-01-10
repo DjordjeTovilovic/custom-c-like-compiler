@@ -1,5 +1,5 @@
 //OPIS: ABS funkcija, rezultat 5
-//RETURN: 53
+//RETURN: 4
 
 int x;
 int y;

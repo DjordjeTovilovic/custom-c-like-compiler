@@ -1,13 +1,13 @@
-//OPIS: inkrement u numexp-u
-//RETURN: 53
-
-int y;
+//RETURN 0
 
 int main() {
-    int x;
-    x = 2;
-    y = 6;
-    y = x++ + y++ + 42;
-    return x + y;
+    int b;
+    int a[2];
+    int c;
+    
+    // int b,c,d,e,f,g,h,j,i,k,l,m,n,o,p,q,r,s,t;
+    a[2] = 2;
+    a[0] = 5;
+    b = a[0];
+    return b;
 }
-

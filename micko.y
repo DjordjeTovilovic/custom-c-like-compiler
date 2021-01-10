@@ -294,6 +294,7 @@ assignment_statement
           else {
             gen_mov($3, idx);
 
+              // printf(" afd fad af af");
             int i = 0;
             while (gl_postinc[i] != 0) {
               code("\n\t\t%s\t", ar_instructions[ADD + (get_type(gl_postinc[i]) - 1) * AROP_NUMBER]);
@@ -307,8 +308,6 @@ assignment_statement
 
         }
       }
-
-      
     }
   // a[5] = 10;
   | _ID _LSQBRACKET literal _RSQBRACKET _ASSIGN num_exp _SEMICOLON 

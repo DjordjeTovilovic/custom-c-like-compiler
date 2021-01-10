@@ -195,24 +195,24 @@ variable
   | _ID _LSQBRACKET literal _RSQBRACKET 
     {
       int i = lookup_symbol($1,VAR|PAR);
+      if(i == -1) {
+          insert_symbol($1, VAR, gl_var_type, ++var_num, atoi(get_name($3)));
       // char* keke = $1 + [];
       // printf("%s", keke);
-      int lit = atoi(get_name($3));
-      if(i == -1) {
-        for (int j = 0; j < lit; j++) {
-          char * keke = strcat($1, "[");
-          char * keke2 = strcat(keke, j);
+      // int lit = atoi(get_name($3));
+        // for (int j = 0; j < lit; j++) {
+        //   char * keke = strcat($1, "[");
+        //   char * keke2 = strcat(keke, j);
           // char buf[64];
           // snprintf(buf, sizeof buf, "%s[%s]", $1, j);
-          insert_symbol(keke2, VAR, gl_var_type, ++var_num, atoi(get_name($3)));
+          // insert_symbol(keke2, VAR, gl_var_type, ++var_num, atoi(get_name($3)));
 
         }
-        // insert_symbol($1, VAR, gl_var_type, ++var_num, atoi(get_name($3)));
         
         // var_num = var_num + atoi(get_name($3)) - 1;
 
         // printf("%d", var_num);
-      }
+      // }
       else
         err("duplicated local var");
     }
@@ -293,6 +293,7 @@ assignment_statement
       if(idx == NO_INDEX)
         err("invalid lvalue '%s' in assignment", $1);
       else {
+        printf("\n %d %d \n", get_type(idx), get_type($3));
         if(get_type(idx) != get_type($3))
           err("incompatible types in assignment");
       }
@@ -317,13 +318,22 @@ assignment_statement
       if(idx == NO_INDEX)
         err("invalid lvalue '%s' in assignment", $1);
       else {
-        if(get_type(idx) != get_type($3))
+        if(get_type(idx) != get_type($6))
           err("incompatible types in assignment");
+        else {
+          if (atoi(get_name($3)) > get_atr2(idx))
+            err("out of bound index for list");
+          else {
+            printf("\n%d\n", idx+2);
+            print_symtab();
+            code("\n\t\tMOV \t");
+            gen_sym_name($6);
+            code(",");
+            code("-%d(%%14)", (get_atr1(idx) + atoi(get_name($3))) * 4);
+            print_symtab();
+          }
+        }
       }
-      // printf("\n%d\n", atoi(get_name($3)));
-      printf("\n%d\n", idx+2);
-      print_symtab();
-      // gen_mov($6, idx+2);// + atoi(get_name($3)));
     }
   ;
 
@@ -412,6 +422,7 @@ exp
       //   gen_sym_name(idx);
       // }
     }
+  | _ID _LSQBRACKET literal _RSQBRACKET { $$ = 1; }
   | _LPAREN rel_exp _RPAREN _QMARK cond_exp _COLON cond_exp
     {
       int out = take_reg();

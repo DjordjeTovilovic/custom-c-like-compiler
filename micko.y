@@ -25,6 +25,7 @@
   int gl_args_type = 0;
   int gl_args[20] = {0};
   int gl_postinc[20] = {0};
+  int gl_list_index = -1;
   FILE *output;
 %}
 
@@ -196,23 +197,9 @@ variable
     {
       int i = lookup_symbol($1,VAR|PAR);
       if(i == -1) {
-          insert_symbol($1, VAR, gl_var_type, ++var_num, atoi(get_name($3)));
-      // char* keke = $1 + [];
-      // printf("%s", keke);
-      // int lit = atoi(get_name($3));
-        // for (int j = 0; j < lit; j++) {
-        //   char * keke = strcat($1, "[");
-        //   char * keke2 = strcat(keke, j);
-          // char buf[64];
-          // snprintf(buf, sizeof buf, "%s[%s]", $1, j);
-          // insert_symbol(keke2, VAR, gl_var_type, ++var_num, atoi(get_name($3)));
-
-        }
-        
-        // var_num = var_num + atoi(get_name($3)) - 1;
-
-        // printf("%d", var_num);
-      // }
+        insert_symbol($1, VAR, gl_var_type, ++var_num, atoi(get_name($3)));
+        var_num = var_num + atoi(get_name($3)) - 1;
+      }
       else
         err("duplicated local var");
     }
@@ -293,22 +280,34 @@ assignment_statement
       if(idx == NO_INDEX)
         err("invalid lvalue '%s' in assignment", $1);
       else {
-        printf("\n %d %d \n", get_type(idx), get_type($3));
+        // printf("\n %d %d \n", get_type(idx), get_type($3));
         if(get_type(idx) != get_type($3))
           err("incompatible types in assignment");
+        else {
+          if (get_atr2($3) != 0 && gl_list_index != -1) {
+            code("\n\t\tMOV \t");
+            code("-%d(%%14)", (get_atr1($3) + gl_list_index) * 4);
+            code(",");
+            gen_sym_name(idx);
+            gl_list_index = -1;
+          }
+          else {
+            gen_mov($3, idx);
+
+            int i = 0;
+            while (gl_postinc[i] != 0) {
+              code("\n\t\t%s\t", ar_instructions[ADD + (get_type(gl_postinc[i]) - 1) * AROP_NUMBER]);
+              gen_sym_name(gl_postinc[i]);
+              code(",$1,");
+              gen_sym_name(gl_postinc[i]);
+              gl_postinc[i] = 0;
+              i++;
+            }
+          }
+
+        }
       }
 
-      gen_mov($3, idx);
-
-      int i = 0;
-      while (gl_postinc[i] != 0) {
-        code("\n\t\t%s\t", ar_instructions[ADD + (get_type(gl_postinc[i]) - 1) * AROP_NUMBER]);
-        gen_sym_name(gl_postinc[i]);
-        code(",$1,");
-        gen_sym_name(gl_postinc[i]);
-        gl_postinc[i] = 0;
-        i++;
-      }
       
     }
   // a[5] = 10;
@@ -324,7 +323,7 @@ assignment_statement
           if (atoi(get_name($3)) > get_atr2(idx))
             err("out of bound index for list");
           else {
-            printf("\n%d\n", idx+2);
+            // printf("\n%d\n", idx+2);
             print_symtab();
             code("\n\t\tMOV \t");
             gen_sym_name($6);
@@ -401,33 +400,15 @@ exp
           i++;
         }
         gl_postinc[i] = $$;
-        // printf ("\n %d \n", i);
       }
-
-      // for (int i = 0; i < 20; i++) {
-      //   if (gl_postinc[i] == 0) {
-      //     gl_postinc[i] = $$;
-      //     printf ("%d", gl_postinc[i]);
-      //     break;
-      //   }
-      //   if (i = 20)
-      //     err("number of maximum postincrements in a statement exceeded");
-      // }
-
-        // err("'%s' undeclared", $1);
-      // else {
-      //   code("\n\t\t%s\t", ar_instructions[ADD + (get_type(idx) - 1) * AROP_NUMBER]);
-      //   gen_sym_name(idx);
-      //   code(",$1,");
-      //   gen_sym_name(idx);
-      // }
     }
   | _ID _LSQBRACKET literal _RSQBRACKET 
     {
       $$ = lookup_symbol($1, VAR|PAR|GVAR);
       if($$ == NO_INDEX)
         err("'%s' undeclared", $1);
-      printf("SFGS  %d #sfafasf", $$);
+      else 
+        gl_list_index = atoi(get_name($3));
     }
   | _LPAREN rel_exp _RPAREN _QMARK cond_exp _COLON cond_exp
     {

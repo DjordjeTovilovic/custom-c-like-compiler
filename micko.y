@@ -192,7 +192,7 @@ variable
   : vars
 
 // deklaracija liste : int a[5];
-  | _ID _LSQBRACKET literal _RSQBRACKET 
+  | _ID _LSQBRACKET num_exp _RSQBRACKET 
     {
       int i = lookup_symbol($1,VAR|PAR);
       if(i == -1) {
@@ -311,7 +311,7 @@ assignment_statement
       }
     }
   // a[5] = 10;
-  | _ID _LSQBRACKET literal _RSQBRACKET _ASSIGN num_exp _SEMICOLON 
+  | _ID _LSQBRACKET num_exp _RSQBRACKET _ASSIGN num_exp _SEMICOLON 
     {
       int idx = lookup_symbol($1, VAR|PAR|GVAR);
       if(idx == NO_INDEX)
@@ -340,17 +340,48 @@ num_exp
       if(get_type($1) != get_type($3))
         err("invalid operands: arithmetic operation");
       else {
-        int t1 = get_type($1);    
-        code("\n\t\t%s\t", ar_instructions[$2 + (t1 - 1) * AROP_NUMBER]);
-        gen_sym_name($1);
-        code(",");
-        gen_sym_name($3);
-        code(",");
-        free_if_reg($3);
-        free_if_reg($1);
-        $$ = take_reg();
-        gen_sym_name($$);
-        set_type($$, t1);
+        if (get_atr2($1) != 0 && gl_list_index != -1) {
+          int t1 = get_type($1);    
+          code("\n\t\t%s\t", ar_instructions[$2 + (t1 - 1) * AROP_NUMBER]);
+          code("-%d(%%14)", (get_atr1($1) + gl_list_index) * 4);
+          code(",");
+          gen_sym_name($3);
+          code(",");
+          free_if_reg($3);
+          free_if_reg($1);
+          $$ = take_reg();
+          gen_sym_name($$);
+          set_type($$, t1);
+        }
+        else {
+          if (get_atr2($3) != 0 && gl_list_index != -1) {
+
+            int t1 = get_type($1);    
+            code("\n\t\t%s\t", ar_instructions[$2 + (t1 - 1) * AROP_NUMBER]);
+            gen_sym_name($1);
+            code(",");
+            code("-%d(%%14)", (get_atr1($3) + gl_list_index) * 4);
+            code(",");
+            free_if_reg($3);
+            free_if_reg($1);
+            $$ = take_reg();
+            gen_sym_name($$);
+            set_type($$, t1);
+        }
+          else {
+            int t1 = get_type($1);    
+            code("\n\t\t%s\t", ar_instructions[$2 + (t1 - 1) * AROP_NUMBER]);
+            gen_sym_name($1);
+            code(",");
+            gen_sym_name($3);
+            code(",");
+            free_if_reg($3);
+            free_if_reg($1);
+            $$ = take_reg();
+            gen_sym_name($$);
+            set_type($$, t1);
+          }
+        }
       }
     }
   ;
@@ -362,17 +393,47 @@ num_exp
       if(get_type($1) != get_type($3))
         err("invalid operands: arithmetic operation");
       else {
-        int t1 = get_type($1);    
-        code("\n\t\t%s\t", m_instructions[$2 + (t1 - 1) * MOP_NUMBER]);
-        gen_sym_name($1);
-        code(",");
-        gen_sym_name($3);
-        code(",");
-        free_if_reg($3);
-        free_if_reg($1);
-        $$ = take_reg();
-        gen_sym_name($$);
-        set_type($$, t1);
+        if (get_atr2($1) != 0 && gl_list_index != -1) {
+          int t1 = get_type($1);    
+          code("\n\t\t%s\t", m_instructions[$2 + (t1 - 1) * MOP_NUMBER]);
+          code("-%d(%%14)", (get_atr1($1) + gl_list_index) * 4);
+          code(",");
+          gen_sym_name($3);
+          code(",");
+          free_if_reg($3);
+          free_if_reg($1);
+          $$ = take_reg();
+          gen_sym_name($$);
+          set_type($$, t1);
+        }
+        else {
+          if (get_atr2($3) != 0 && gl_list_index != -1) {
+            int t1 = get_type($1);    
+            code("\n\t\t%s\t", m_instructions[$2 + (t1 - 1) * MOP_NUMBER]);
+            gen_sym_name($1);
+            code(",");
+            code("-%d(%%14)", (get_atr1($3) + gl_list_index) * 4);
+            code(",");
+            free_if_reg($3);
+            free_if_reg($1);
+            $$ = take_reg();
+            gen_sym_name($$);
+            set_type($$, t1);
+        }
+          else {
+            int t1 = get_type($1);    
+            code("\n\t\t%s\t", m_instructions[$2 + (t1 - 1) * MOP_NUMBER]);
+            gen_sym_name($1);
+            code(",");
+            gen_sym_name($3);
+            code(",");
+            free_if_reg($3);
+            free_if_reg($1);
+            $$ = take_reg();
+            gen_sym_name($$);
+            set_type($$, t1);
+          }
+        }
       }
     }
   ;

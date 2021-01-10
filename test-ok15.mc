@@ -1,4 +1,6 @@
+//inicializacija liste, dodjeljivanje vrednosti, i koristenje vrednosti elemenata liste u dodjeli
 //RETURN: 19
+
 
 int main() {
     int b;

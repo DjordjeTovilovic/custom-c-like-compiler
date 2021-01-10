@@ -422,7 +422,13 @@ exp
       //   gen_sym_name(idx);
       // }
     }
-  | _ID _LSQBRACKET literal _RSQBRACKET { $$ = 1; }
+  | _ID _LSQBRACKET literal _RSQBRACKET 
+    {
+      $$ = lookup_symbol($1, VAR|PAR|GVAR);
+      if($$ == NO_INDEX)
+        err("'%s' undeclared", $1);
+      printf("SFGS  %d #sfafasf", $$);
+    }
   | _LPAREN rel_exp _RPAREN _QMARK cond_exp _COLON cond_exp
     {
       int out = take_reg();

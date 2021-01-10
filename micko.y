@@ -320,7 +320,7 @@ assignment_statement
         if(get_type(idx) != get_type($6))
           err("incompatible types in assignment");
         else {
-          if (atoi(get_name($3)) > get_atr2(idx))
+          if (atoi(get_name($3)) >= get_atr2(idx) || atoi(get_name($3)) < 0)
             err("out of bound index for list");
           else {
             code("\n\t\tMOV \t");
@@ -469,7 +469,7 @@ exp
       if($$ == NO_INDEX)
         err("'%s' undeclared", $1);
       else {
-        if (atoi(get_name($3)) >= get_atr2($$))
+        if (atoi(get_name($3)) >= get_atr2($$) || atoi(get_name($3)) < 0)
           err("list index out of bound");
         else
           gl_list_index = atoi(get_name($3));

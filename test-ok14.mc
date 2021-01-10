@@ -1,5 +1,5 @@
 //OPIS: branch grananje i ugnezdeno branch grananje
-//RETURN 12
+//RETURN: 12
 int grananje(){
   int res, a;
   res = 0;

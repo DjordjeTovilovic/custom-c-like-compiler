@@ -1,5 +1,5 @@
 //OPIS: iterate petlja i ugnezdena iterate petlja
-//RETURN 30
+//RETURN: 30
 int ugnjezdena(){
   int a, g, s;
   s = 0;

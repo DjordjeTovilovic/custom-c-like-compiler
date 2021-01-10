@@ -1,14 +1,15 @@
 //OPIS: postinkrement
-//RETURN 6
-int abs(int i) {
+//RETURN: 1
+
+int increment(int i) {
   int res, a, b;
   a = i++;
   res = 0;
   b = res++;
-  b = res + b++ - i;
+  b = res + b++;
   return b;
 }
 
 int main() {
-  return abs(-5);
+  return increment(-5);
 }

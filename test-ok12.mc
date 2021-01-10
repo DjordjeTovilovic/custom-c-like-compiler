@@ -1,5 +1,5 @@
 //OPIS: mnozenje i deljenje
-//RETURN -3
+//RETURN: -3
 int test(int i) {
   int res, a, b;
   b = 3;

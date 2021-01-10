@@ -284,6 +284,7 @@ assignment_statement
           err("incompatible types in assignment");
         else {
           if (get_atr2($3) != 0 && gl_list_index != -1) {
+            print_symtab();
             code("\n\t\tMOV \t");
             code("-%d(%%14)", (get_atr1($3) + gl_list_index) * 4);
             code(",");
@@ -406,8 +407,12 @@ exp
       $$ = lookup_symbol($1, VAR|PAR|GVAR);
       if($$ == NO_INDEX)
         err("'%s' undeclared", $1);
-      else 
-        gl_list_index = atoi(get_name($3));
+      else {
+        if (atoi(get_name($3)) >= get_atr2($$))
+          err("list index out of bound");
+        else
+          gl_list_index = atoi(get_name($3));
+      }
     }
   | _LPAREN rel_exp _RPAREN _QMARK cond_exp _COLON cond_exp
     {

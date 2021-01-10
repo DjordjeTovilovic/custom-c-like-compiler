@@ -196,8 +196,13 @@ variable
     {
       int i = lookup_symbol($1,VAR|PAR);
       if(i == -1) {
-        insert_symbol($1, VAR, gl_var_type, ++var_num, atoi(get_name($3)));
-        var_num = var_num + atoi(get_name($3)) - 1;
+        if (atoi(get_name($3)) < 1) {
+          err("list has to have at least one element");
+        }
+        else {
+          insert_symbol($1, VAR, gl_var_type, ++var_num, atoi(get_name($3)));
+          var_num = var_num + atoi(get_name($3)) - 1;
+        }
       }
       else
         err("duplicated local var");
@@ -480,14 +485,16 @@ exp
       int out = take_reg();
       if(get_type($5) != get_type($7))
         err("exp1 i exp2 have to be the same type");
-      code("\n\t\t%s\t@false%d", opp_jumps[$2], ++lab_num);
-      code("\n@true%d:", lab_num);
-      gen_mov($5, out);
-      code("\n\t\tJMP \t@exit%d", lab_num);
-      code("\n@false%d:", lab_num);
-      gen_mov($7, out);
-      code("\n@exit%d:", lab_num);
-      $$ = out;
+      else {
+        code("\n\t\t%s\t@false%d", opp_jumps[$2], ++lab_num);
+        code("\n@true%d:", lab_num);
+        gen_mov($5, out);
+        code("\n\t\tJMP \t@exit%d", lab_num);
+        code("\n@false%d:", lab_num);
+        gen_mov($7, out);
+        code("\n@exit%d:", lab_num);
+        $$ = out;
+      }
     }
   | function_call
     {

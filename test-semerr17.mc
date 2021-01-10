@@ -1,4 +1,4 @@
-//pristupa elementu liste van opsega
+//OPIS: pristupa elementu liste van opsega
 
 int main() {
     int b;

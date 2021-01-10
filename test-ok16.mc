@@ -1,4 +1,4 @@
-//inicializacija liste, dodjeljivanje vrednosti, i koristenje vrednosti elemenata liste u dodjeli sa unsigned brojevima
+//OPIS: inicializacija liste, dodjeljivanje vrednosti, i koristenje vrednosti elemenata liste u dodjeli sa unsigned brojevima
 //RETURN: 6
 
 

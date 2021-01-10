@@ -1,4 +1,4 @@
-//dodjela vrjednosti drugog tipa
+//OPIS: dodjela vrjednosti drugog tipa u listu
 
 int main() {
     int b;

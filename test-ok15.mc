@@ -1,4 +1,4 @@
-//inicializacija liste, dodjeljivanje vrednosti, i koristenje vrednosti elemenata liste u dodjeli
+//OPIS: inicializacija liste, dodjeljivanje vrednosti, i koristenje vrednosti elemenata liste u dodjeli
 //RETURN: 19
 
 

@@ -1,4 +1,4 @@
-//OPIS: inicializacija liste sa manje od jedog elementa
+//OPIS: inicializacija liste sa manje od jednog elementa
 
 int main() {
     int b;
